@@ -54,7 +54,10 @@ def main() -> int:
     run([py, "-m", "pip", "install", "-q", "--upgrade", "pip"])
     run([py, "-m", "pip", "install", "-q", "torch==2.9.1", "torchvision==0.24.1",
          "--index-url", f"https://download.pytorch.org/whl/{index}"])
-    run([py, "-m", "pip", "install", "-q", "-e", REPO])
+    # Pin torch in the same resolve: something in the tree otherwise pulls a newer
+    # torch over the validated 2.9.1 (seen on Modal: 2.15 with cu13 wheels).
+    run([py, "-m", "pip", "install", "-q", "-e", REPO, "torch==2.9.1", "torchvision==0.24.1",
+         "--extra-index-url", f"https://download.pytorch.org/whl/{index}"])
 
     env = dict(os.environ, MUJOCO_GL="egl", PYOPENGL_PLATFORM="egl", CUDA_VISIBLE_DEVICES="0")
     log = WORK / "peek_train.log"
